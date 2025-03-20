@@ -15,10 +15,10 @@ pipeline {
 
         stage('Build Images') {
             steps {
-                sh 'docker build - t frontend:${BUILD_NUMBER} ./src/frontend'
-                sh 'docker build - t productcatalog:${BUILD_NUMBER} ./src/productcatalogservice'
-                sh 'docker build - t currencyservice:${BUILD_NUMBER} ./src/currencyservice'
-                sh 'docker build - t cartservice:${BUILD_NUMBER} ./src/cartservice/src'
+                sh 'docker build -t frontend:${BUILD_NUMBER} ./src/frontend'
+                sh 'docker build -t productcatalog:${BUILD_NUMBER} ./src/productcatalogservice'
+                sh 'docker build -t currencyservice:${BUILD_NUMBER} ./src/currencyservice'
+                sh 'docker build -t cartservice:${BUILD_NUMBER} ./src/cartservice/src'
             }
         }
         
