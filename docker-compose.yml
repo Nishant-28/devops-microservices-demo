@@ -21,7 +21,7 @@ services:
       - shippingservice
       - checkoutservice
       - adservice
-    restart: always
+    # restart: always
 
   productcatalogservice:
     build: ./src/productcatalogservice
