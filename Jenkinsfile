@@ -21,7 +21,7 @@ pipeline {
                 sh 'docker build -t cartservice:${BUILD_NUMBER} ./src/cartservice/src'
             }
         }
-        
+
         stage('Run Tests') {
             steps {
                 sh '''
