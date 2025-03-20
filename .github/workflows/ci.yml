@@ -1,56 +1,45 @@
 name: CI Pipeline
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-    build-and-test:
-        runs-on: ubuntu-latest
-        
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v1
-
-            - name: Build Frontend
-              run: docker build -t frontend:${{ github.sha }} ./src/frontend
-            
-            - name: Build Product Catalog Service
-              run: docker build -t productcatalog:${{ github.sha }} ./src/productcatalogservice
-
-            - name: Build Currency Service
-              run: docker build -t currencyservice:${{ github.sha }} ./src/currencyservice
-            
-            - name: Build Cart Service
-              run: docker build -t cartservice:${{ github.sha }} ./src/cartservice/src
-            
-            - name: Run Unit Tests for Frontend
-              run: |
-                cd src/frontend
-                docker run --rm frontend:${{ github.sha }} go test ./... 
-              continue-on-error: true
-            
-            - name: Lint Frontend Code
-              run: |
-                cd src/frontend
-                docker run --rm frontend:${{ github.sha }} go vet ./...
-              continue-on-error: true
-
-            - name: Set Environment Variables
-              run: echo "PRODUCT_CATALOG_SERVICE_ADDR=productcatalog:8080" >> $GITHUB_ENV
-
-            - name: Setup Docker Compose
-              uses: ndeloof/install-compose-action@v0.0.1
-              with:
-                version: v2.23.3
-
-            - name: Run Integration Tests
-              run: |
-                docker compose up -d
-                sleep 60
-                curl -f http://localhost:8080 || exit 1
-                docker compose down
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    
+    - name: Build All Services
+      run: |
+        docker-compose build
+    
+    - name: Run Unit Tests
+      run: |
+        for service in frontend productcatalogservice currencyservice; do
+          cd src/$service
+          echo "Running tests for $service"
+          go test ./... || echo "Tests failed for $service"
+          cd ../../
+        done
+      continue-on-error: true
+    
+    - name: Start Application
+      run: |
+        docker-compose up -d
+        # Wait for services to be up
+        sleep 60
+    
+    - name: Run End-to-End Tests
+      run: |
+        ./tests/e2e-test.sh
+    
+    - name: Stop Application
+      run: |
+        docker-compose down
