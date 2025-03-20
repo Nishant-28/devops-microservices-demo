@@ -1,19 +1,20 @@
 version: '3'
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile
     privileged: true
-    user: root  # Run as root initially
+    user: root  # Run Jenkins as root
     ports:
-      - 8090:8080
-      - 50000:50000
+      - "8090:8080"
+      - "50000:50000"
     container_name: jenkins
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow Jenkins to use Docker
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-    entrypoint: /usr/local/bin/jenkins.sh
 
 volumes:
   jenkins_home:
