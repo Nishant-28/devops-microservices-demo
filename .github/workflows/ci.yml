@@ -48,9 +48,9 @@ jobs:
               with:
                 version: v2.23.3
 
-            # - name: Run Integration Tests
-            #   run: |
-            #     docker compose up -d
-            #     sleep 60
-            #     curl -f http://localhost:8080 || exit 1
-            #     docker compose down
+            - name: Run Integration Tests
+              run: |
+                docker compose up -d
+                sleep 60
+                curl -f http://localhost:8080 || exit 1
+                docker compose down
